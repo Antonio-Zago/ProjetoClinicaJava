@@ -10,6 +10,8 @@ import javax.swing.JPanel;
 import javax.swing.border.EmptyBorder;
 import java.awt.GridLayout;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
+
 import java.awt.FlowLayout;
 import javax.swing.BoxLayout;
 import javax.swing.SwingConstants;
@@ -33,9 +35,11 @@ import javax.swing.border.LineBorder;
 import java.awt.Color;
 import javax.swing.JTable;
 import javax.swing.table.DefaultTableModel;
+import javax.swing.text.MaskFormatter;
 import javax.swing.JScrollPane;
 import java.awt.event.ActionListener;
 import java.sql.SQLException;
+import java.text.ParseException;
 import java.util.ArrayList;
 import java.awt.event.ActionEvent;
 import java.awt.event.MouseAdapter;
@@ -68,6 +72,15 @@ public class cadastroMedico extends JFrame {
 			}
 		});
 	}
+	
+	private void formatarCampo(JFormattedTextField crm) {
+		try {
+			MaskFormatter mascara = new MaskFormatter("#####");
+			mascara.install(crm);
+		} catch (ParseException e) {
+			JOptionPane.showMessageDialog(null, "Erro ao formatar CRM: \n" + e);
+		}
+	}
 
 	/**
 	 * Create the frame.
@@ -80,6 +93,9 @@ public class cadastroMedico extends JFrame {
 		contentPane.setBorder(new EmptyBorder(25, 5, 25, 5));
 		setContentPane(contentPane);
 		contentPane.setLayout(new BorderLayout(20, 20));
+		
+		JButton btnNovoMedico = new JButton("Novo");
+		
 		
 		JPanel panel = new JPanel();
 		panel.setBorder(new LineBorder(new Color(0, 0, 0)));
@@ -97,7 +113,11 @@ public class cadastroMedico extends JFrame {
 		panel.add(txtNome);
 		txtNome.setColumns(10);
 		
-		JFormattedTextField ftxtCrm = new JFormattedTextField();
+		
+		
+		
+		JFormattedTextField ftxtCrm = 	new JFormattedTextField();
+		formatarCampo(ftxtCrm);
 		ftxtCrm.setEnabled(false);
 		ftxtCrm.setBounds(512, 325, 201, 20);
 		panel.add(ftxtCrm);
@@ -119,47 +139,6 @@ public class cadastroMedico extends JFrame {
 		cbEspecialidade.setBounds(138, 379, 201, 22);
 		panel.add(cbEspecialidade);
 		
-		JButton btnLimparMedico = new JButton("Limpar Campos");
-		btnLimparMedico.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-			}
-		});
-		btnLimparMedico.setEnabled(false);
-		btnLimparMedico.setBounds(20, 512, 201, 23);
-		panel.add(btnLimparMedico);
-		
-		JButton btnCadatroMedico = new JButton("Cadastrar");
-		btnCadatroMedico.setEnabled(false);
-		btnCadatroMedico.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				Medico med = new Medico();
-				
-				med.setNome(txtNome.getText());
-				med.setEspecilaidade(cbEspecialidade.getSelectedItem().toString());
-				med.setCrm(Integer.parseInt(ftxtCrm.getText()));
-				
-				cont_med.Gravar(med);
-				
-				txtNome.setText("");
-				ftxtCrm.setText("");
-				txtNome.setEnabled(false);
-				ftxtCrm.setEnabled(false);
-				cbEspecialidade.setEnabled(false);
-				btnCadatroMedico.setEnabled(false);
-				btnLimparMedico.setEnabled(true);
-				
-				DefaultTableModel model = (DefaultTableModel) table.getModel();
-				
-				//Remove as linhas da pesquisa anterior
-				int rowCount = model.getRowCount();
-				for (int i = rowCount - 1; i >= 0; i--) {
-				    model.removeRow(i);
-				}
-			}
-		});
-		btnCadatroMedico.setBounds(20, 478, 201, 23);
-		panel.add(btnCadatroMedico);
-		
 		JButton btnSalvarMedico = new JButton("Salvar");
 		btnSalvarMedico.setEnabled(false);
 		btnSalvarMedico.addActionListener(new ActionListener() {
@@ -180,6 +159,7 @@ public class cadastroMedico extends JFrame {
 				cbEspecialidade.setEnabled(false);
 				txtCodMedico.setText("");
 				btnSalvarMedico.setEnabled(false);
+				btnNovoMedico.setEnabled(true);
 				
 				DefaultTableModel model = (DefaultTableModel) table.getModel();
 				
@@ -192,35 +172,6 @@ public class cadastroMedico extends JFrame {
 		});
 		btnSalvarMedico.setBounds(20, 580, 201, 23);
 		panel.add(btnSalvarMedico);
-		
-		JButton btnEditarMedico = new JButton("Editar");
-		btnEditarMedico.setEnabled(false);
-		btnEditarMedico.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				txtNome.setEnabled(true);
-				ftxtCrm.setEnabled(true);
-				cbEspecialidade.setEnabled(true);
-				btnSalvarMedico.setEnabled(true);
-				btnEditarMedico.setEnabled(false);
-			}
-		});
-		btnEditarMedico.setBounds(20, 546, 201, 23);
-		panel.add(btnEditarMedico);
-		
-		JScrollPane scrollPane = new JScrollPane();
-		scrollPane.setBounds(20, 126, 693, 129);
-		panel.add(scrollPane);
-		
-		JLabel lblNewLabel_1_1 = new JLabel("Cod_Medico");
-		lblNewLabel_1_1.setFont(new Font("Tahoma", Font.PLAIN, 14));
-		lblNewLabel_1_1.setBounds(20, 281, 105, 14);
-		panel.add(lblNewLabel_1_1);
-		
-		txtCodMedico = new JTextField();
-		txtCodMedico.setEnabled(false);
-		txtCodMedico.setBounds(135, 278, 56, 20);
-		panel.add(txtCodMedico);
-		txtCodMedico.setColumns(10);
 		
 		JButton btnExluirMedico = new JButton("Excluir");
 		btnExluirMedico.addActionListener(new ActionListener() {
@@ -250,13 +201,77 @@ public class cadastroMedico extends JFrame {
 		btnExluirMedico.setBounds(20, 614, 201, 23);
 		panel.add(btnExluirMedico);
 		
+		JButton btnCadatroMedico = new JButton("Cadastrar");
+		btnCadatroMedico.setEnabled(false);
+		btnCadatroMedico.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				Medico med = new Medico();
+				
+				med.setNome(txtNome.getText());
+				med.setEspecilaidade(cbEspecialidade.getSelectedItem().toString());
+				med.setCrm(Integer.parseInt(ftxtCrm.getText()));
+				
+				cont_med.Gravar(med);
+				
+				txtNome.setText("");
+				ftxtCrm.setText("");
+				txtNome.setEnabled(false);
+				ftxtCrm.setEnabled(false);
+				cbEspecialidade.setEnabled(false);
+				btnCadatroMedico.setEnabled(false);
+				btnNovoMedico.setEnabled(true);
+				
+				DefaultTableModel model = (DefaultTableModel) table.getModel();
+				
+				//Remove as linhas da pesquisa anterior
+				int rowCount = model.getRowCount();
+				for (int i = rowCount - 1; i >= 0; i--) {
+				    model.removeRow(i);
+				}
+			}
+		});
+		btnCadatroMedico.setBounds(20, 512, 201, 23);
+		panel.add(btnCadatroMedico);
+		
+		
+		JButton btnEditarMedico = new JButton("Editar");
+		btnEditarMedico.setEnabled(false);
+		btnEditarMedico.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				txtNome.setEnabled(true);
+				ftxtCrm.setEnabled(true);
+				cbEspecialidade.setEnabled(true);
+				btnSalvarMedico.setEnabled(true);
+				btnEditarMedico.setEnabled(false);
+				btnExluirMedico.setEnabled(false);
+				btnNovoMedico.setEnabled(false);
+			}
+		});
+		btnEditarMedico.setBounds(20, 546, 201, 23);
+		panel.add(btnEditarMedico);
+		
+		JScrollPane scrollPane = new JScrollPane();
+		scrollPane.setBounds(20, 126, 693, 129);
+		panel.add(scrollPane);
+		
+		JLabel lblNewLabel_1_1 = new JLabel("Cod_Medico");
+		lblNewLabel_1_1.setFont(new Font("Tahoma", Font.PLAIN, 14));
+		lblNewLabel_1_1.setBounds(20, 281, 105, 14);
+		panel.add(lblNewLabel_1_1);
+		
+		txtCodMedico = new JTextField();
+		txtCodMedico.setEnabled(false);
+		txtCodMedico.setBounds(135, 278, 56, 20);
+		panel.add(txtCodMedico);
+		txtCodMedico.setColumns(10);
+		
+		
 		table = new JTable();
 		table.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseClicked(MouseEvent e) {
 				
 				btnEditarMedico.setEnabled(true);
-				btnLimparMedico.setEnabled(false);
 				btnExluirMedico.setEnabled(true);
 				
 				//Mostrando a linha selecionada
@@ -278,15 +293,47 @@ public class cadastroMedico extends JFrame {
 		scrollPane.setViewportView(table);
 		
 		JLabel lblNewLabel_3 = new JLabel("Pesquisa:");
-		lblNewLabel_3.setBounds(116, 48, 67, 14);
+		lblNewLabel_3.setBounds(276, 11, 67, 14);
 		panel.add(lblNewLabel_3);
 		
+
+		btnNovoMedico.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				
+				btnNovoMedico.setEnabled(false);
+				btnCadatroMedico.setEnabled(true);
+				txtNome.setEnabled(true);
+				txtNome.setText("");
+				ftxtCrm.setText("");
+				cbEspecialidade.setSelectedIndex(0);
+				ftxtCrm.setEnabled(true);
+				cbEspecialidade.setEnabled(true);
+				txtCodMedico.setText("");
+				btnEditarMedico.setEnabled(false);
+				btnExluirMedico.setEnabled(false);
+			}
+		});
+		btnNovoMedico.setBounds(20, 478, 201, 23);
+		panel.add(btnNovoMedico);
+		
+		JPanel panel_1 = new JPanel();
+		panel_1.setBorder(new LineBorder(new Color(0, 0, 0)));
+		panel_1.setBounds(20, 28, 693, 74);
+		panel.add(panel_1);
+		panel_1.setLayout(null);
+		
+		JLabel lblNewLabel_4 = new JLabel("Nome:");
+		lblNewLabel_4.setBounds(64, 15, 71, 14);
+		panel_1.add(lblNewLabel_4);
+		
 		txtNomeMedicoPesquisa = new JTextField();
-		txtNomeMedicoPesquisa.setBounds(193, 45, 287, 20);
-		panel.add(txtNomeMedicoPesquisa);
+		txtNomeMedicoPesquisa.setBounds(137, 12, 226, 20);
+		panel_1.add(txtNomeMedicoPesquisa);
 		txtNomeMedicoPesquisa.setColumns(10);
 		
 		JButton btnPesquisarMedico = new JButton("Pesquisar");
+		btnPesquisarMedico.setBounds(284, 43, 147, 23);
+		panel_1.add(btnPesquisarMedico);
 		btnPesquisarMedico.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				
@@ -317,28 +364,6 @@ public class cadastroMedico extends JFrame {
 				}
 			}
 		});
-		btnPesquisarMedico.setBounds(524, 44, 167, 23);
-		panel.add(btnPesquisarMedico);
-		
-		JButton btnNovoMedico = new JButton("Novo");
-		btnNovoMedico.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				
-				btnNovoMedico.setEnabled(false);
-				btnCadatroMedico.setEnabled(true);
-				txtNome.setEnabled(true);
-				txtNome.setText("");
-				ftxtCrm.setText("");
-				cbEspecialidade.setSelectedIndex(0);
-				ftxtCrm.setEnabled(true);
-				cbEspecialidade.setEnabled(true);
-				btnLimparMedico.setEnabled(true);
-				txtCodMedico.setText("");
-				btnEditarMedico.setEnabled(false);
-			}
-		});
-		btnNovoMedico.setBounds(20, 444, 201, 23);
-		panel.add(btnNovoMedico);
 		
 		
 		
